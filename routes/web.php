@@ -52,6 +52,17 @@ Route::middleware('auth')->group(function () {
         // Latihan Soal
         Route::get('/latihan',                 [PackageController::class, 'index'])->name('latihan.index');
         Route::get('/latihan/{package}',        [PackageController::class, 'show'])->name('latihan.show');
+        Route::get('/latihan/{package}/mulai', [SessionController::class, 'start'])->name('latihan.start');
+        Route::get('/latihan/sesi/{session}', [SessionController::class, 'show'])->name('latihan.mulai');
+        Route::post('/latihan/sesi/{session}/jawab', [SessionController::class, 'submitAnswer'])->name('latihan.submit');
+        Route::post('/latihan/sesi/{session}/selesai', [SessionController::class, 'finish'])->name('latihan.finish');
+        Route::get('/latihan/sesi/{session}/hasil', [\App\Http\Controllers\Student\ResultController::class, 'show'])->name('latihan.hasil');
+
+        // Try Out
+        Route::get('/tryout', [\App\Http\Controllers\Student\TryoutController::class, 'index'])->name('tryout.index');
+
+        // Laporan
+        Route::get('/laporan', [\App\Http\Controllers\Student\ReportController::class, 'index'])->name('laporan.index');
         });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {

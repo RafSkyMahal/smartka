@@ -1,0 +1,48 @@
+@extends('layouts.app')
+@section('title', 'Daftar Try Out')
+
+@section('content')
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-2" style="font-family:'Plus Jakarta Sans',sans-serif">Try Out Nasional</h1>
+    <p class="text-gray-500">Uji kemampuanmu dengan simulasi ujian sesungguhnya yang dilengkapi waktu ketat.</p>
+</div>
+
+@if($packages->isEmpty())
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center mt-6">
+    <p class="text-gray-500 mb-4">Belum ada jadwal Try Out yang tersedia untuk jenjang kamu saat ini.</p>
+    <p class="text-6xl">🗓️</p>
+</div>
+@else
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+    @foreach($packages as $package)
+    <a href="{{ route('latihan.show', $package->id) }}" class="block bg-gradient-to-br from-white to-gray-50 rounded-2xl border border-red-100 shadow-sm p-6 transition-all hover:shadow-md hover:border-red-300 relative overflow-hidden">
+        
+        <!-- Decoration -->
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-red-500 rounded-full opacity-10"></div>
+        
+        <div class="flex justify-between items-start mb-3">
+            <h2 class="text-lg font-bold text-gray-800 relative z-10" style="font-family:'Plus Jakarta Sans',sans-serif">{{ $package->name }}</h2>
+            @if($package->type === 'free')
+            <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full relative z-10">GRATIS</span>
+            @else
+            <span class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-0.5 rounded-full relative z-10">PREMIUM</span>
+            @endif
+        </div>
+        
+        <p class="text-sm text-gray-600 mb-5 relative z-10">{{ Str::limit($package->description, 100) }}</p>
+        
+        <div class="flex items-center text-sm text-gray-500 gap-4 mt-auto">
+            <div class="flex items-center gap-1 bg-white px-2 py-1 rounded border border-gray-100 shadow-sm">
+                <span class="text-base">📝</span>
+                <span class="font-semibold">{{ $package->total_questions }} Soal</span>
+            </div>
+            <div class="flex items-center gap-1 bg-red-50 px-2 py-1 rounded border border-red-100 shadow-sm text-red-700">
+                <span class="text-base">⏱️</span>
+                <span class="font-bold">{{ $package->duration_minutes }} Menit</span>
+            </div>
+        </div>
+    </a>
+    @endforeach
+</div>
+@endif
+@endsection

@@ -67,9 +67,9 @@
 
       @foreach([
         ['dashboard',        '🏠', 'Beranda',       route('dashboard')],
-        ['latihan',          '📝', 'Latihan Soal',  '#'],
-        ['tryout',           '⏱️', 'Try Out',        '#'],
-        ['laporan',          '📊', 'Laporan',        '#'],
+        ['latihan',          '📝', 'Latihan Soal',  route('latihan.index')],
+        ['tryout',           '⏱️', 'Try Out',        route('tryout.index')],
+        ['laporan',          '📊', 'Laporan',        route('laporan.index')],
         ['ai',               '🤖', 'AI Tutor',       '#'],
         ['pembahasan',       '📖', 'Pembahasan',     '#'],
         ['peringkat',        '🏆', 'Peringkat',      '#'],
@@ -133,10 +133,33 @@
       </div>
       <div class="flex items-center gap-3">
         {{-- Notifikasi --}}
-        <button class="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-200 transition relative">
-          🔔
-          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
+        <div class="relative" x-data="{ showNotif: false }">
+          <button @click="showNotif = !showNotif" @click.outside="showNotif = false" class="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-200 transition relative focus:outline-none">
+            🔔
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+          
+          <div x-show="showNotif" x-transition.opacity
+               class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-lg border border-gray-100 z-50 overflow-hidden" style="display: none;">
+            <div class="px-4 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+              <span class="font-bold text-sm text-gray-800">Notifikasi</span>
+              <button class="text-xs text-blue-600 hover:underline">Tandai dibaca</button>
+            </div>
+            <div class="max-h-64 overflow-y-auto">
+              <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-50 cursor-pointer transition">
+                <p class="text-sm text-gray-800">Selamat datang di <strong>SMARTKA</strong>! Mari mulai belajarmu hari ini 🚀</p>
+                <span class="text-xs text-gray-400 mt-1 block">Baru saja</span>
+              </div>
+              <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition">
+                <p class="text-sm text-gray-800">Paket latihan soal Pilihan Ganda & Essay terbaru telah dirilis!</p>
+                <span class="text-xs text-gray-400 mt-1 block">2 jam yang lalu</span>
+              </div>
+            </div>
+            <div class="p-3 border-t border-gray-100 text-center bg-gray-50">
+              <a href="#" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition">Lihat Semua Notifikasi</a>
+            </div>
+          </div>
+        </div>
         {{-- Avatar --}}
         <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center text-base">🧑‍🎓</div>
       </div>

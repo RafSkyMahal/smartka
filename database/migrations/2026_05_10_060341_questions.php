@@ -23,7 +23,7 @@ return new class extends Migration
         $table->text('option_c')->nullable();
         $table->text('option_d')->nullable();
         $table->text('option_e')->nullable();
-        $table->string('correct_answer', 1); // a/b/c/d/e
+        $table->text('correct_answer'); // a/b/c/d/e or full essay text
         $table->longText('explanation_text')->nullable();
         $table->string('explanation_video_url')->nullable();
         $table->string('source')->nullable();

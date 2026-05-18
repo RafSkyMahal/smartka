@@ -12,7 +12,7 @@ return new class extends Migration
         $table->id();
         $table->foreignId('session_id')->constrained('user_sessions')->onDelete('cascade');
         $table->foreignId('question_id')->constrained()->onDelete('cascade');
-        $table->string('selected_answer', 1)->nullable();
+        $table->text('selected_answer')->nullable();
         $table->boolean('is_correct')->default(false);
         $table->boolean('is_marked')->default(false);
         $table->boolean('hint_used')->default(false);

@@ -42,7 +42,7 @@
     Mulai Latihan
 </button>
 @else
-<a href="#" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center">
+<a href="{{ route('latihan.start', $package->id) }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center">
     <span class="text-lg mr-2">▶️</span> Mulai Latihan
 </a>
 @endif

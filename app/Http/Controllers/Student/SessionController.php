@@ -22,7 +22,7 @@ class SessionController extends Controller
         $user = Auth::user();
 
         // Authorization check
-        if ($user->class_level !== $package->class_level || $package->status !== 'active') {
+        if ($user->class_level !== $package->class_level || $package->status !== 'published') {
             abort(403, 'Akses ditolak.');
         }
 
@@ -104,7 +104,7 @@ class SessionController extends Controller
 
         $request->validate([
             'question_id'     => 'required|exists:questions,id',
-            'selected_answer' => 'nullable|string|max:1',
+            'selected_answer' => 'nullable|string',
             'time_spent'      => 'required|integer|min:0',
             'is_marked'       => 'boolean',
             // 'hint_used'       => 'boolean', // Assuming hint_used is also submitted
@@ -114,7 +114,14 @@ class SessionController extends Controller
 
         $isCorrect = null;
         if ($request->selected_answer !== null) {
-            $isCorrect = ($request->selected_answer === $question->correct_answer);
+            if ($question->type === 'multiple_choice') {
+                $isCorrect = ($request->selected_answer === $question->correct_answer);
+            } else {
+                // Untuk soal essay (short_answer)
+                $studentAns = preg_replace('/\s+/', ' ', strtolower(trim($request->selected_answer)));
+                $correctAns = preg_replace('/\s+/', ' ', strtolower(trim($question->correct_answer)));
+                $isCorrect = ($studentAns === $correctAns);
+            }
         }
 
         UserAnswer::updateOrCreate(

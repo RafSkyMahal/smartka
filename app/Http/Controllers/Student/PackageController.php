@@ -19,7 +19,7 @@ class PackageController extends Controller
         $classLevel = $user->class_level;
 
         $packages = TestPackage::where('class_level', $classLevel)
-                               ->where('status', 'active')
+                               ->where('status', 'published')
                                ->orderBy('created_at', 'desc')
                                ->get();
 
@@ -35,7 +35,7 @@ class PackageController extends Controller
         $user = Auth::user();
 
         // Ensure user can access this package based on class level and status
-        if ($user->class_level !== $package->class_level || $package->status !== 'active') {
+        if ($user->class_level !== $package->class_level || $package->status !== 'published') {
             abort(403, 'Akses ditolak.');
         }
 
