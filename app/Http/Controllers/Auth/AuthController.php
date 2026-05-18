@@ -8,219 +8,205 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class AuthController extends Controller
 {
-    // ─── LOGIN ────────────────────────────────────────────
-
+    // ─── Show Login ───────────────────────────────────────────────
     public function showLogin()
     {
+        if (Auth::check()) return redirect()->route('dashboard');
         return view('auth.login');
     }
 
+    // ─── Login ────────────────────────────────────────────────────
     public function login(Request $request)
     {
         $request->validate([
             'email'    => 'required|email',
-            'password' => 'required|string',
+            'password' => 'required',
         ]);
 
         $credentials = $request->only('email', 'password');
         $remember    = $request->boolean('remember');
 
         if (!Auth::attempt($credentials, $remember)) {
-            return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Email atau password salah. Silakan coba lagi.']);
+            return back()->withErrors(['email' => 'Email atau password salah.'])->withInput();
         }
 
+        /** @var User $user */
         $user = Auth::user();
 
-        // Cek apakah email sudah diverifikasi
+        // Kalau email belum diverifikasi, kirim OTP lagi
         if (!$user->email_verified_at) {
-            // Kirim ulang OTP lalu arahkan ke halaman verifikasi
-            $this->generateAndSendOtp($user);
+            $this->sendOtp($user);
             session(['otp_user_id' => $user->id]);
             Auth::logout();
-            return redirect()->route('otp.show')
-                ->with('info', 'Verifikasi email kamu terlebih dahulu.');
+            return redirect()->route('verify-otp')->with('info', 'Verifikasi email kamu dulu ya.');
         }
 
         $request->session()->regenerate();
 
-        // Arahkan berdasarkan role
-        if ($user->role === 'admin') {
-            return redirect()->intended('/admin/dashboard');
-        }
-
-        return redirect()->intended('/dashboard');
+        return $user->role === 'admin'
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('dashboard');
     }
 
-    // ─── REGISTER ─────────────────────────────────────────
-
+    // ─── Show Register ────────────────────────────────────────────
     public function showRegister()
     {
+        if (Auth::check()) return redirect()->route('dashboard');
         return view('auth.register');
     }
 
+    // ─── Register ─────────────────────────────────────────────────
     public function register(Request $request)
     {
         $request->validate([
-            'name'            => 'required|string|max:100',
-            'email'           => 'required|email|unique:users,email',
-            'phone'           => 'required|string|max:15',
-            'password'        => 'required|string|min:8|confirmed',
-            'class_level'     => 'required|in:6,9,12',
-            'terms'           => 'accepted',
-        ], [
-            'name.required'        => 'Nama lengkap wajib diisi.',
-            'email.unique'         => 'Email ini sudah terdaftar.',
-            'password.min'         => 'Password minimal 8 karakter.',
-            'password.confirmed'   => 'Konfirmasi password tidak cocok.',
-            'class_level.required' => 'Pilih jenjang kelas kamu.',
-            'terms.accepted'       => 'Kamu harus menyetujui syarat & ketentuan.',
+            'name'                  => 'required|string|max:100',
+            'email'                 => 'required|email|unique:users,email',
+            'password'              => 'required|min:8|confirmed',
+            'grade_level'           => 'required|in:6,9,12',
         ]);
 
         $user = User::create([
             'name'        => $request->name,
             'email'       => $request->email,
-            'phone'       => $request->phone,
             'password'    => Hash::make($request->password),
-            'class_level' => $request->class_level,
+            'grade_level' => $request->grade_level,
             'role'        => 'student',
         ]);
 
-        // Generate & kirim OTP
-        $this->generateAndSendOtp($user);
-
-        // Simpan user_id di session untuk verifikasi OTP
+        $this->sendOtp($user);
         session(['otp_user_id' => $user->id]);
 
-        return redirect()->route('otp.show')
-            ->with('success', 'Kode OTP telah dikirim ke email kamu.');
+        return redirect()->route('verify-otp')->with('success', 'Akun dibuat! Cek email untuk kode OTP.');
     }
 
-    // ─── OTP ──────────────────────────────────────────────
-
+    // ─── Show OTP ─────────────────────────────────────────────────
     public function showOtp()
     {
-        if (!session('otp_user_id')) {
-            return redirect()->route('register');
-        }
+        if (!session('otp_user_id')) return redirect()->route('login');
         return view('auth.verify-otp');
     }
 
+    // ─── Verify OTP ───────────────────────────────────────────────
     public function verifyOtp(Request $request)
     {
-        $request->validate([
-            'otp' => 'required|string|size:6',
-        ], [
-            'otp.size' => 'Kode OTP harus 6 digit.',
-        ]);
+        $request->validate(['otp' => 'required|string|size:6']);
 
         $userId = session('otp_user_id');
         $user   = User::find($userId);
 
-        if (!$user) {
-            return redirect()->route('register')
-                ->withErrors(['otp' => 'Sesi tidak valid. Silakan daftar ulang.']);
+        if (!$user) return redirect()->route('login');
+
+        if (
+            $user->otp_code === $request->otp &&
+            $user->otp_expires_at &&
+            Carbon::now()->lt($user->otp_expires_at)
+        ) {
+            $user->update([
+                'email_verified_at' => now(),
+                'otp_code'          => null,
+                'otp_expires_at'    => null,
+            ]);
+
+            Auth::login($user);
+            session()->forget('otp_user_id');
+            $request->session()->regenerate();
+
+            return redirect()->route('dashboard')->with('success', 'Email terverifikasi!');
         }
 
-        // Cek kode OTP (pastikan perbandingan string)
-        if ((string)$user->otp_code !== (string)$request->otp) {
-            return back()->withErrors(['otp' => 'Kode OTP salah. Periksa email kamu.']);
-        }
-
-        // Cek apakah OTP sudah expired (10 menit)
-        if (Carbon::now()->isAfter($user->otp_expires_at)) {
-            return back()->withErrors(['otp' => 'Kode OTP sudah kadaluarsa. Klik "Kirim ulang".']);
-        }
-
-        // Verifikasi berhasil
-        $user->update([
-            'email_verified_at' => now(),
-            'otp_code'          => null,
-            'otp_expires_at'    => null,
-        ]);
-
-        session()->forget('otp_user_id');
-
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect()->route('dashboard')
-            ->with('success', 'Akun berhasil diverifikasi! Selamat datang di SMARTKA 🎉');
+        return back()->withErrors(['otp' => 'Kode OTP salah atau sudah kadaluarsa.']);
     }
 
+    // ─── Resend OTP ───────────────────────────────────────────────
     public function resendOtp(Request $request)
     {
         $userId = session('otp_user_id');
         $user   = User::find($userId);
 
-        if (!$user) {
-            return response()->json(['error' => 'Sesi tidak valid.'], 422);
-        }
+        if (!$user) return redirect()->route('login');
 
-        $this->generateAndSendOtp($user);
-
-        return response()->json(['message' => 'Kode OTP baru telah dikirim ke email kamu.']);
+        $this->sendOtp($user);
+        return back()->with('success', 'OTP baru sudah dikirim ke email kamu.');
     }
 
-    // ─── FORGOT PASSWORD ──────────────────────────────────
-
+    // ─── Show Forgot Password ─────────────────────────────────────
     public function showForgot()
     {
         return view('auth.forgot-password');
     }
 
+    // ─── Send Reset Link ──────────────────────────────────────────
     public function sendReset(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ], [
-            'email.exists' => 'Email ini tidak terdaftar di SMARTKA.',
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Email tidak ditemukan.']);
+        }
+
+        $token = Str::random(64);
+        $user->update([
+            'otp_code'       => $token,
+            'otp_expires_at' => now()->addMinutes(30),
         ]);
 
-        $status = Password::sendResetLink($request->only('email'));
+        // Kirim email reset (pakai mail sederhana)
+        $resetUrl = route('reset-password', ['token' => $token]) . '?email=' . urlencode($user->email);
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('success', 'Link reset password telah dikirim ke email kamu.')
-            : back()->withErrors(['email' => 'Gagal mengirim link reset. Coba lagi.']);
+        try {
+            Mail::raw("Klik link ini untuk reset password SMARTKA kamu:\n\n{$resetUrl}\n\nLink berlaku 30 menit.", function ($m) use ($user) {
+                $m->to($user->email)->subject('Reset Password SMARTKA');
+            });
+        } catch (\Exception $e) {
+            // Kalau mail gagal, tetap lanjut (development mode)
+        }
+
+        return back()->with('success', 'Link reset password sudah dikirim ke email kamu.');
     }
 
-    public function showReset(string $token)
+    // ─── Show Reset Password ──────────────────────────────────────
+    public function showReset(Request $request, $token)
     {
-        return view('auth.reset-password', ['token' => $token]);
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email'),
+        ]);
     }
 
+    // ─── Reset Password ───────────────────────────────────────────
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'token'                 => 'required',
-            'email'                 => 'required|email',
-            'password'              => 'required|string|min:8|confirmed',
-        ], [
-            'password.min'       => 'Password baru minimal 8 karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'email'    => 'required|email',
+            'token'    => 'required',
+            'password' => 'required|min:8|confirmed',
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
-                $user->forceFill(['password' => Hash::make($password)])->save();
-            }
-        );
+        $user = User::where('email', $request->email)
+                    ->where('otp_code', $request->token)
+                    ->first();
 
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('success', 'Password berhasil direset! Silakan login.')
-            : back()->withErrors(['email' => __($status)]);
+        if (!$user || !$user->otp_expires_at || Carbon::now()->gt($user->otp_expires_at)) {
+            return back()->withErrors(['token' => 'Link reset tidak valid atau sudah kadaluarsa.']);
+        }
+
+        $user->update([
+            'password'      => Hash::make($request->password),
+            'otp_code'      => null,
+            'otp_expires_at'=> null,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Password berhasil diubah. Silakan login.');
     }
 
-    // ─── LOGOUT ───────────────────────────────────────────
-
+    // ─── Logout ───────────────────────────────────────────────────
     public function logout(Request $request)
     {
         Auth::logout();
@@ -229,21 +215,21 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    // ─── HELPER ───────────────────────────────────────────
-
-    private function generateAndSendOtp(User $user): void
+    // ─── Helper: Kirim OTP ────────────────────────────────────────
+    private function sendOtp(User $user): void
     {
-        $otp = Str::padLeft(random_int(0, 999999), 6, '0');
-
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $user->update([
-            'otp_code'        => $otp,
-            'otp_expires_at'  => Carbon::now()->addMinutes(10),
+            'otp_code'       => $otp,
+            'otp_expires_at' => now()->addMinutes(10),
         ]);
 
-        // Kirim email OTP
-        Mail::send('emails.otp', ['user' => $user, 'otp' => $otp], function ($mail) use ($user, $otp) {
-            $mail->to($user->email)
-                 ->subject('Kode Verifikasi SMARTKA — ' . $otp);
-        });
+        try {
+            Mail::send('emails.otp', ['otp' => $otp, 'user' => $user], function ($m) use ($user) {
+                $m->to($user->email)->subject('Kode OTP SMARTKA');
+            });
+        } catch (\Exception $e) {
+            // Silent fail saat development (mail belum dikonfigurasi)
+        }
     }
 }

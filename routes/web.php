@@ -50,36 +50,31 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-// ── Admin ────────────────────────────────────────────
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard',                    [AdminController::class, 'dashboard'])->name('dashboard');
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Bank Soal
-    Route::get('/soal',                         [QuestionController::class, 'index'])->name('soal.index');
-    Route::get('/soal/tambah',                  [QuestionController::class, 'create'])->name('soal.create');
-    Route::post('/soal',                        [QuestionController::class, 'store'])->name('soal.store');
-    Route::get('/soal/{question}/edit',         [QuestionController::class, 'edit'])->name('soal.edit');
-    Route::put('/soal/{question}',              [QuestionController::class, 'update'])->name('soal.update');
-    Route::delete('/soal/{question}',           [QuestionController::class, 'destroy'])->name('soal.destroy');
+    // Soal
+    Route::get('/soal', [QuestionController::class, 'index'])->name('soal.index');
+    Route::get('/soal/tambah', [QuestionController::class, 'create'])->name('soal.create');
+    Route::post('/soal', [QuestionController::class, 'store'])->name('soal.store');
+    Route::get('/soal/{question}/edit', [QuestionController::class, 'edit'])->name('soal.edit');
+    Route::put('/soal/{question}', [QuestionController::class, 'update'])->name('soal.update');
+    Route::delete('/soal/{question}', [QuestionController::class, 'destroy'])->name('soal.destroy');
 
-    // Paket Latihan
-    Route::get('/paket',                        [AdminPackageController::class, 'index'])->name('paket.index');
-    Route::get('/paket/tambah',                 [AdminPackageController::class, 'create'])->name('paket.create');
-    Route::post('/paket',                       [AdminPackageController::class, 'store'])->name('paket.store');
-    Route::get('/paket/{package}/edit',         [AdminPackageController::class, 'edit'])->name('paket.edit');
-    Route::put('/paket/{package}',              [AdminPackageController::class, 'update'])->name('paket.update');
-    Route::delete('/paket/{package}',           [AdminPackageController::class, 'destroy'])->name('paket.destroy');
+    // Paket
+    Route::get('/paket', [AdminPackageController::class, 'index'])->name('paket.index');
+    Route::get('/paket/tambah', [AdminPackageController::class, 'create'])->name('paket.create');
+    Route::post('/paket', [AdminPackageController::class, 'store'])->name('paket.store');
 
     // Pengguna
-    Route::get('/pengguna',                     [AdminUserController::class, 'index'])->name('pengguna.index');
-    Route::get('/pengguna/{user}',              [AdminUserController::class, 'show'])->name('pengguna.show');
-    Route::post('/pengguna/{user}/suspend',     [AdminUserController::class, 'suspend'])->name('pengguna.suspend');
-    Route::post('/pengguna/{user}/upgrade',     [AdminUserController::class, 'upgrade'])->name('pengguna.upgrade');
-    Route::post('/pengguna/{user}/reset-pass',  [AdminUserController::class, 'resetPassword'])->name('pengguna.reset-pass');
+    Route::get('/pengguna', [AdminUserController::class, 'index'])->name('pengguna.index');
+    Route::get('/pengguna/{user}', [AdminUserController::class, 'show'])->name('pengguna.show');
+    Route::post('/pengguna/{user}/suspend', [AdminUserController::class, 'suspend'])->name('pengguna.suspend');
+    Route::post('/pengguna/{user}/upgrade', [AdminUserController::class, 'upgrade'])->name('pengguna.upgrade');
 
     // AI Monitor
-    Route::get('/ai-monitor',                   [AiMonitorController::class, 'index'])->name('ai-monitor');
-    Route::put('/settings/ai-prompt',           [AiMonitorController::class, 'updatePrompt'])->name('settings.ai-prompt');
+    Route::get('/ai-monitor', [AiMonitorController::class, 'index'])->name('ai-monitor.index');
+    Route::put('/settings/ai-prompt', [AiMonitorController::class, 'updatePrompt'])->name('settings.ai-prompt');
 });
 
 // ── Payment Webhook ──────────────────────────────────
