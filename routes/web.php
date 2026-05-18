@@ -16,6 +16,8 @@ use App\Http\Controllers\Student\SessionController;
 
 // ── Public ──────────────────────────────────────────
 Route::get('/', fn() => view('landing.index'))->name('home');
+Route::view('/syarat-ketentuan', 'pages.terms')->name('terms');
+Route::view('/kebijakan-privasi', 'pages.privacy')->name('privacy');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login',                  [AuthController::class, 'showLogin'])->name('login');
