@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AiMonitorController;
 use App\Http\Controllers\Admin\AdminPackageController;
+use App\Http\Controllers\Student\PackageController;
+use App\Http\Controllers\Student\SessionController;
 
 // ── Public ──────────────────────────────────────────
 Route::get('/', fn() => view('landing.index'))->name('home');
@@ -20,9 +22,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login',                 [AuthController::class, 'login'])->name('login.post');
     Route::get('/register',               [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register',              [AuthController::class, 'register'])->name('register.post');
-    Route::get('/verify-otp',             [AuthController::class, 'showOtp'])->name('otp.show');
-    Route::post('/verify-otp',            [AuthController::class, 'verifyOtp'])->name('otp.verify');
-    Route::post('/resend-otp',            [AuthController::class, 'resendOtp'])->name('otp.resend');
+
     Route::get('/forgot-password',        [AuthController::class, 'showForgot'])->name('password.request');
     Route::post('/forgot-password',       [AuthController::class, 'sendReset'])->name('password.email');
     Route::get('/reset-password/{token}', [AuthController::class, 'showReset'])->name('password.reset');
@@ -46,9 +46,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/chat/{message}/feedback', [AiChatController::class, 'feedback'])->name('feedback');
         Route::post('/chat/{message}/star',     [AiChatController::class, 'star'])->name('star');
         Route::get('/sessions',                 [AiChatController::class, 'sessions'])->name('sessions');
-        Route::get('/sessions/{session}',       [AiChatController::class, 'sessionMessages'])->name('session.messages');
-    });
-});
+        Route::get('/ai/sessions/{session}',       [AiChatController::class, 'sessionMessages'])->name('session.messages');
+        });
+
+        // Latihan Soal
+        Route::get('/latihan',                 [PackageController::class, 'index'])->name('latihan.index');
+        Route::get('/latihan/{package}',        [PackageController::class, 'show'])->name('latihan.show');
+        });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');

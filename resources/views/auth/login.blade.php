@@ -4,64 +4,18 @@
 @section('content')
 <div class="min-h-screen flex">
 
-  {{-- KIRI: Ilustrasi --}}
-  <div class="hidden lg:flex w-3/5 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 flex-col items-center justify-center p-12 relative overflow-hidden">
-    {{-- Dekorasi background --}}
-    <div class="absolute top-0 left-0 w-72 h-72 bg-white opacity-5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full translate-x-1/3 translate-y-1/3"></div>
-
-    <div class="relative z-10 text-center text-white max-w-md">
-      {{-- Logo --}}
-      <div class="flex items-center justify-center gap-3 mb-10">
-        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-          <span class="text-blue-600 text-2xl">🚀</span>
-        </div>
-        <span class="text-3xl font-extrabold tracking-wide" style="font-family:'Plus Jakarta Sans',sans-serif">SMARTKA</span>
-      </div>
-
-      {{-- Ilustrasi emoji besar --}}
-      <div class="text-9xl mb-8 select-none">📚</div>
-
-      <h2 class="text-3xl font-bold mb-4" style="font-family:'Plus Jakarta Sans',sans-serif">
-        Selamat Datang Kembali,<br>Pejuang Nilai! 💪
-      </h2>
-      <p class="text-blue-200 text-lg leading-relaxed">
-        Ribuan soal, analisis AI, dan try out menunggumu.<br>
-        Yuk lanjutkan perjalanan belajarmu!
-      </p>
-
-      {{-- Stats --}}
-      <div class="flex gap-6 justify-center mt-10">
-        <div class="text-center">
-          <div class="text-2xl font-bold">50K+</div>
-          <div class="text-blue-300 text-sm">Siswa Aktif</div>
-        </div>
-        <div class="w-px bg-blue-400"></div>
-        <div class="text-center">
-          <div class="text-2xl font-bold">200K+</div>
-          <div class="text-blue-300 text-sm">Soal Tersedia</div>
-        </div>
-        <div class="w-px bg-blue-400"></div>
-        <div class="text-center">
-          <div class="text-2xl font-bold">95%</div>
-          <div class="text-blue-300 text-sm">Tingkat Lulus</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {{-- KANAN: Form Login --}}
-  <div class="w-full lg:w-2/5 flex items-center justify-center p-8">
+  {{-- KIRI: Form Login --}}
+  <div class="w-full lg:w-2/5 flex items-center justify-center p-8 bg-white z-10 shadow-2xl relative">
     <div class="w-full max-w-md">
 
-      {{-- Logo mobile --}}
-      <div class="flex items-center gap-2 mb-8 lg:hidden">
+      {{-- Logo mobile & desktop --}}
+      <div class="flex items-center gap-2 mb-8 justify-center lg:justify-start">
         <span class="text-2xl">🚀</span>
         <span class="text-xl font-extrabold text-blue-600" style="font-family:'Plus Jakarta Sans',sans-serif">SMARTKA</span>
       </div>
 
-      <h1 class="text-2xl font-bold text-gray-800 mb-1" style="font-family:'Plus Jakarta Sans',sans-serif">Masuk ke Akun</h1>
-      <p class="text-gray-500 mb-6 text-sm">Belum punya akun? <a href="{{ route('register') }}" class="text-blue-600 font-semibold hover:underline">Daftar gratis</a></p>
+      <h1 class="text-2xl font-bold text-gray-800 mb-1 lg:text-left text-center" style="font-family:'Plus Jakarta Sans',sans-serif">Masuk ke Akun</h1>
+      <p class="text-gray-500 mb-8 text-sm lg:text-left text-center">Belum punya akun? <a href="{{ route('register') }}" class="text-blue-600 font-semibold hover:underline">Daftar gratis</a></p>
 
       {{-- Alert error --}}
       @if($errors->any())
@@ -91,7 +45,7 @@
         @csrf
 
         {{-- Email --}}
-        <div class="mb-4">
+        <div class="mb-5">
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
           <input
             type="email" name="email" value="{{ old('email') }}"
@@ -102,7 +56,7 @@
         </div>
 
         {{-- Password --}}
-        <div class="mb-4">
+        <div class="mb-5">
           <div class="flex justify-between items-center mb-1.5">
             <label class="text-sm font-medium text-gray-700">Password</label>
             <a href="{{ route('password.request') }}" class="text-xs text-blue-600 hover:underline">Lupa password?</a>
@@ -131,14 +85,14 @@
 
         {{-- Submit --}}
         <button type="submit"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition text-sm shadow-sm">
-          Masuk ke SMARTKA →
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow-md">
+          Masuk Sekarang →
         </button>
       </form>
 
-      <div class="my-5 flex items-center gap-3">
+      <div class="my-6 flex items-center gap-3">
         <div class="flex-1 h-px bg-gray-200"></div>
-        <span class="text-xs text-gray-400">atau</span>
+        <span class="text-xs text-gray-400">Keamanan Terjamin</span>
         <div class="flex-1 h-px bg-gray-200"></div>
       </div>
 
@@ -148,5 +102,43 @@
       </p>
     </div>
   </div>
+
+  {{-- KANAN: Ilustrasi (Sedikit dibedakan dari Register) --}}
+  <div class="hidden lg:flex w-3/5 bg-gradient-to-bl from-indigo-800 via-blue-700 to-blue-600 flex-col items-center justify-center p-12 relative overflow-hidden">
+    {{-- Dekorasi background --}}
+    <div class="absolute top-10 right-10 w-64 h-64 bg-white opacity-5 rounded-full blur-2xl"></div>
+    <div class="absolute bottom-10 left-10 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl"></div>
+
+    <div class="relative z-10 text-center text-white max-w-md">
+      
+      {{-- Ilustrasi emoji besar (berbeda dari register) --}}
+      <div class="text-9xl mb-10 select-none drop-shadow-2xl hover:scale-110 transition-transform cursor-default">🔑</div>
+
+      <h2 class="text-4xl font-bold mb-4 leading-tight" style="font-family:'Plus Jakarta Sans',sans-serif">
+        Selamat Datang Kembali! ✨
+      </h2>
+      <p class="text-blue-100 text-lg leading-relaxed mb-8 opacity-90">
+        Lanjutkan belajarmu hari ini. Ribuan soal, pembahasan detail, dan analisis AI sudah siap membantumu meraih nilai terbaik!
+      </p>
+
+      {{-- Testimonial / Highlight --}}
+      <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-left inline-block w-full max-w-sm">
+        <div class="flex gap-1 mb-2 text-yellow-400 text-sm">
+          ★★★★★
+        </div>
+        <p class="text-sm text-white/90 italic mb-3">
+          "Berkat SMARTKA, nilai try out aku naik drastis dan aku berhasil masuk ke sekolah impianku!"
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center text-xs font-bold">A</div>
+          <div>
+            <div class="text-sm font-semibold">Andi S.</div>
+            <div class="text-xs text-blue-200">Siswa Kelas 9</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 @endsection

@@ -2,7 +2,7 @@
 @section('title', 'Daftar Gratis')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4"
+<div class="min-h-screen flex"
   x-data="{
     step: 1,
     name: '{{ old('name') }}',
@@ -24,50 +24,93 @@
     }
   }">
 
-  <div class="w-full max-w-lg">
+  {{-- KIRI: Ilustrasi --}}
+  <div class="hidden lg:flex w-3/5 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 flex-col items-center justify-center p-12 relative overflow-hidden">
+    {{-- Dekorasi background --}}
+    <div class="absolute top-0 left-0 w-72 h-72 bg-white opacity-5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full translate-x-1/3 translate-y-1/3"></div>
 
-    {{-- Logo --}}
-    <div class="flex items-center justify-center gap-2 mb-6">
-      <span class="text-2xl">🚀</span>
-      <span class="text-2xl font-extrabold text-blue-600" style="font-family:'Plus Jakarta Sans',sans-serif">SMARTKA</span>
-    </div>
-
-    {{-- Stepper --}}
-    <div class="flex items-center justify-center mb-8 gap-2">
-      <template x-for="i in 3" :key="i">
-        <div class="flex items-center">
-          <div class="flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold transition-all"
-            :class="step >= i ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-500'">
-            <span x-show="step > i">✓</span>
-            <span x-show="step <= i" x-text="i"></span>
-          </div>
-          <div x-show="i < 3" class="w-16 h-1 mx-1 rounded transition-all"
-            :class="step > i ? 'bg-blue-600' : 'bg-gray-200'"></div>
+    <div class="relative z-10 text-center text-white max-w-md">
+      {{-- Logo --}}
+      <div class="flex items-center justify-center gap-3 mb-10">
+        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+          <span class="text-blue-600 text-2xl">🚀</span>
         </div>
-      </template>
-    </div>
-    <div class="flex justify-between text-xs text-gray-500 mb-6 px-2">
-      <span :class="step >= 1 ? 'text-blue-600 font-semibold' : ''">Data Diri</span>
-      <span :class="step >= 2 ? 'text-blue-600 font-semibold' : ''">Pilih Jenjang</span>
-      <span :class="step >= 3 ? 'text-blue-600 font-semibold' : ''">Verifikasi</span>
-    </div>
+        <span class="text-3xl font-extrabold tracking-wide" style="font-family:'Plus Jakarta Sans',sans-serif">SMARTKA</span>
+      </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      {{-- Ilustrasi emoji besar --}}
+      <div class="text-9xl mb-8 select-none">🎯</div>
+
+      <h2 class="text-3xl font-bold mb-4" style="font-family:'Plus Jakarta Sans',sans-serif">
+        Mulai Perjalanan<br>Prestasimu Disini! 🌟
+      </h2>
+      <p class="text-blue-200 text-lg leading-relaxed">
+        Ribuan soal, analisis AI, dan try out menunggumu.<br>
+        Daftar sekarang dan nikmati fitur gratis!
+      </p>
+
+      {{-- Stats --}}
+      <div class="flex gap-6 justify-center mt-10">
+        <div class="text-center">
+          <div class="text-2xl font-bold">50K+</div>
+          <div class="text-blue-300 text-sm">Siswa Aktif</div>
+        </div>
+        <div class="w-px bg-blue-400"></div>
+        <div class="text-center">
+          <div class="text-2xl font-bold">200K+</div>
+          <div class="text-blue-300 text-sm">Soal Tersedia</div>
+        </div>
+        <div class="w-px bg-blue-400"></div>
+        <div class="text-center">
+          <div class="text-2xl font-bold">95%</div>
+          <div class="text-blue-300 text-sm">Tingkat Lulus</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{-- KANAN: Form Register --}}
+  <div class="w-full lg:w-2/5 flex items-center justify-center p-8 bg-white overflow-y-auto max-h-screen">
+    <div class="w-full max-w-md py-8">
+
+      {{-- Logo mobile --}}
+      <div class="flex items-center gap-2 mb-8 lg:hidden justify-center">
+        <span class="text-2xl">🚀</span>
+        <span class="text-xl font-extrabold text-blue-600" style="font-family:'Plus Jakarta Sans',sans-serif">SMARTKA</span>
+      </div>
+
+      {{-- Stepper --}}
+      <div class="flex items-center justify-center mb-6 gap-2">
+        <template x-for="i in 2" :key="i">
+          <div class="flex items-center">
+            <div class="flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold transition-all"
+              :class="step >= i ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-500'">
+              <span x-show="step > i">✓</span>
+              <span x-show="step <= i" x-text="i"></span>
+            </div>
+            <div x-show="i < 2" class="w-16 h-1 mx-1 rounded transition-all"
+              :class="step > i ? 'bg-blue-600' : 'bg-gray-200'"></div>
+          </div>
+        </template>
+      </div>
+      
 
       {{-- Error global --}}
       @if($errors->any())
-      <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-5 text-sm flex gap-2">
-        <span>⚠️</span><span>{{ $errors->first() }}</span>
+      <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-5 text-sm flex items-start gap-3">
+        <span class="text-lg">⚠️</span>
+        <span>{{ $errors->first() }}</span>
       </div>
       @endif
 
       <form method="POST" action="{{ route('register.post') }}">
         @csrf
-        <input type="hidden" name="class_level" x-model="class_level">
+        <input type="hidden" name="grade_level" x-model="class_level">
 
         {{-- ── STEP 1: Data Diri ── --}}
         <div x-show="step === 1" x-transition>
-          <h2 class="text-xl font-bold text-gray-800 mb-1" style="font-family:'Plus Jakarta Sans',sans-serif">Buat Akun Baru</h2>
+          <h1 class="text-2xl font-bold text-gray-800 mb-1" style="font-family:'Plus Jakarta Sans',sans-serif">Buat Akun Baru</h1>
           <p class="text-gray-500 text-sm mb-6">Sudah punya akun? <a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">Masuk</a></p>
 
           <div class="mb-4">
@@ -96,7 +139,7 @@
                 placeholder="Minimal 8 karakter"
                 class="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
               <button type="button" @click="showPass = !showPass"
-                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 <span x-show="!showPass">👁️</span><span x-show="showPass">🙈</span>
               </button>
             </div>
@@ -123,7 +166,7 @@
                 placeholder="Ulangi password"
                 class="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
               <button type="button" @click="showPassConfirm = !showPassConfirm"
-                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 <span x-show="!showPassConfirm">👁️</span><span x-show="showPassConfirm">🙈</span>
               </button>
             </div>
@@ -142,13 +185,13 @@
 
           <button type="button" @click="step = 2"
             :disabled="!name || !email || !phone || !password || password !== password_confirmation"
-            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition text-sm">
+            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition text-sm shadow-sm">
             Lanjut — Pilih Jenjang →
           </button>
         </div>
 
         {{-- ── STEP 2: Pilih Jenjang ── --}}
-        <div x-show="step === 2" x-transition>
+        <div x-show="step === 2" style="display: none;" x-transition>
           <h2 class="text-xl font-bold text-gray-800 mb-1" style="font-family:'Plus Jakarta Sans',sans-serif">Kamu Kelas Berapa?</h2>
           <p class="text-gray-500 text-sm mb-6">Pilih jenjang untuk mendapatkan soal yang sesuai.</p>
 
@@ -163,10 +206,9 @@
                   <div class="font-bold text-gray-800 text-base">Kelas 6 SD</div>
                   <div class="text-xs text-gray-500 mt-0.5">Seleksi masuk SMP favorit</div>
                   <div class="flex flex-wrap gap-1.5 mt-2">
-                    <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">Matematika</span>
-                    <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">IPA</span>
-                    <span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded-full">B. Indonesia</span>
-                    <span class="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">IPS</span>
+                    <span class="bg-blue-100 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">Matematika</span>
+                    <span class="bg-green-100 text-green-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">IPA</span>
+                    <span class="bg-yellow-100 text-yellow-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">B. Indonesia</span>
                   </div>
                 </div>
                 <div x-show="class_level === '6'" class="text-blue-600 text-xl">✅</div>
@@ -183,11 +225,9 @@
                   <div class="font-bold text-gray-800 text-base">Kelas 9 SMP</div>
                   <div class="text-xs text-gray-500 mt-0.5">Seleksi masuk SMA/SMK negeri</div>
                   <div class="flex flex-wrap gap-1.5 mt-2">
-                    <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">Matematika</span>
-                    <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">IPA</span>
-                    <span class="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">IPS</span>
-                    <span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded-full">B. Indonesia</span>
-                    <span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full">B. Inggris</span>
+                    <span class="bg-blue-100 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">Matematika</span>
+                    <span class="bg-green-100 text-green-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">IPA</span>
+                    <span class="bg-red-100 text-red-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">B. Inggris</span>
                   </div>
                 </div>
                 <div x-show="class_level === '9'" class="text-blue-600 text-xl">✅</div>
@@ -204,10 +244,9 @@
                   <div class="font-bold text-gray-800 text-base">Kelas 12 SMA/SMK</div>
                   <div class="text-xs text-gray-500 mt-0.5">UTBK/SNBT & ujian mandiri PTN</div>
                   <div class="flex flex-wrap gap-1.5 mt-2">
-                    <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">TPS</span>
-                    <span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded-full">Literasi</span>
-                    <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">Matematika</span>
-                    <span class="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">IPA/IPS</span>
+                    <span class="bg-blue-100 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">TPS</span>
+                    <span class="bg-yellow-100 text-yellow-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">Literasi</span>
+                    <span class="bg-purple-100 text-purple-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">Saintek/Soshum</span>
                   </div>
                 </div>
                 <div x-show="class_level === '12'" class="text-blue-600 text-xl">✅</div>
@@ -217,12 +256,12 @@
 
           <div class="flex gap-3">
             <button type="button" @click="step = 1"
-              class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50 transition text-sm">
+              class="w-1/3 border border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50 transition text-sm">
               ← Kembali
             </button>
             <button type="submit" :disabled="!class_level"
-              class="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition text-sm">
-              Daftar & Verifikasi →
+              class="w-2/3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition text-sm shadow-sm">
+              Daftar Sekarang →
             </button>
           </div>
 
@@ -235,6 +274,18 @@
         </div>
 
       </form>
+
+      <div class="my-5 flex items-center gap-3">
+        <div class="flex-1 h-px bg-gray-200"></div>
+        <span class="text-xs text-gray-400">atau</span>
+        <div class="flex-1 h-px bg-gray-200"></div>
+      </div>
+
+      <p class="text-center text-xs text-gray-400 mt-6">
+        Dengan mendaftar, kamu menyetujui
+        <a href="#" class="text-blue-600 hover:underline">Syarat & Ketentuan</a> SMARTKA.
+      </p>
+
     </div>
   </div>
 </div>
