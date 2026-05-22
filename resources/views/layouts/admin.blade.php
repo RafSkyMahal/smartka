@@ -55,6 +55,8 @@
 
       @foreach([
         ['admin/dashboard',  '📊', 'Dashboard',     'admin.dashboard'],
+        ['admin/mata-pelajaran', '📚', 'Mata Pelajaran', 'admin.mata-pelajaran.index'],
+        ['admin/topik',      '📑', 'Topik / Bab',   'admin.topik.index'],
         ['admin/soal',       '📝', 'Bank Soal',      'admin.soal.index'],
         ['admin/paket',      '📦', 'Paket Latihan',  'admin.paket.index'],
         ['admin/pengguna',   '👥', 'Pengguna',       'admin.pengguna.index'],

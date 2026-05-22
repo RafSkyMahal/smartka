@@ -38,9 +38,14 @@
 
 {{-- Tabel --}}
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-  <div class="px-6 py-4 border-b border-gray-100 flex justify-between">
-    <h3 class="font-bold text-gray-800">Daftar Pengguna</h3>
-    <span class="text-xs text-gray-400">{{ $users->total() }} pengguna</span>
+  <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+    <div>
+        <h3 class="font-bold text-gray-800">Daftar Pengguna</h3>
+        <span class="text-xs text-gray-400">{{ $users->total() }} pengguna</span>
+    </div>
+    <a href="{{ route('admin.pengguna.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+        + Tambah User
+    </a>
   </div>
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
@@ -89,10 +94,15 @@
                 class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium transition">
                 Detail
               </a>
-              <form method="POST" action="{{ route('admin.pengguna.suspend', $u) }}">
+              <a href="{{ route('admin.pengguna.edit', $u) }}"
+                class="text-xs bg-yellow-50 hover:bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg font-medium transition">
+                Edit
+              </a>
+              <form method="POST" action="{{ route('admin.pengguna.destroy', $u) }}" x-data @submit.prevent="if(confirm('Yakin ingin menghapus pengguna ini? (Soft Delete)')) $el.submit()">
                 @csrf
-                <button class="text-xs {{ $u->email_verified_at ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100' }} px-3 py-1.5 rounded-lg font-medium transition">
-                  {{ $u->email_verified_at ? 'Suspend' : 'Aktifkan' }}
+                @method('DELETE')
+                <button class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg font-medium transition">
+                  Hapus
                 </button>
               </form>
             </div>
