@@ -14,6 +14,8 @@
     showPass: false,
     showPassConfirm: false,
     passwordStrength: 0,
+    terms: localStorage.getItem('smartka_terms') === 'true',
+    privacy: localStorage.getItem('smartka_privacy') === 'true',
     checkStrength(p) {
       let s = 0;
       if (p.length >= 8) s++;
@@ -71,8 +73,8 @@
   </div>
 
   {{-- KANAN: Form Register --}}
-  <div class="w-full lg:w-2/5 flex items-center justify-center p-8 bg-white overflow-y-auto max-h-screen">
-    <div class="w-full max-w-md py-8">
+  <div class="w-full lg:w-2/5 flex items-start justify-center p-8 bg-white overflow-y-auto h-screen py-12 lg:py-16">
+    <div class="w-full max-w-md">
 
       {{-- Logo mobile --}}
       <div class="flex items-center gap-2 mb-8 lg:hidden justify-center">
@@ -94,7 +96,6 @@
           </div>
         </template>
       </div>
-      
 
       {{-- Error global --}}
       @if($errors->any())
@@ -176,15 +177,23 @@
             </p>
           </div>
 
-          <div class="flex items-start gap-2 mb-6">
-            <input type="checkbox" name="terms" id="terms" class="mt-0.5 w-4 h-4 text-blue-600 rounded border-gray-300" required>
-            <label for="terms" class="text-sm text-gray-600">
-              Saya menyetujui <a href="#" class="text-blue-600 hover:underline">Syarat & Ketentuan</a> dan <a href="#" class="text-blue-600 hover:underline">Kebijakan Privasi</a> SMARTKA
-            </label>
+          <div class="flex flex-col gap-3 mb-6">
+            <div class="flex items-start gap-2">
+              <input type="checkbox" id="reg_terms" x-model="terms" @change="localStorage.setItem('smartka_terms', terms)" class="mt-0.5 w-4 h-4 text-blue-600 rounded border-gray-300">
+              <label for="reg_terms" class="text-sm text-gray-600">
+                Saya menyetujui <a href="{{ route('terms') }}" class="text-blue-600 font-medium hover:underline">Syarat & Ketentuan</a> SMARTKA
+              </label>
+            </div>
+            <div class="flex items-start gap-2">
+              <input type="checkbox" id="reg_privacy" x-model="privacy" @change="localStorage.setItem('smartka_privacy', privacy)" class="mt-0.5 w-4 h-4 text-blue-600 rounded border-gray-300">
+              <label for="reg_privacy" class="text-sm text-gray-600">
+                Saya menyetujui <a href="{{ route('privacy') }}" class="text-blue-600 font-medium hover:underline">Kebijakan Privasi</a> SMARTKA
+              </label>
+            </div>
           </div>
 
           <button type="button" @click="step = 2"
-            :disabled="!name || !email || !phone || !password || password !== password_confirmation"
+            :disabled="!name || !email || !phone || !password || password !== password_confirmation || !terms || !privacy"
             class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition text-sm shadow-sm">
             Lanjut — Pilih Jenjang →
           </button>
@@ -275,15 +284,9 @@
 
       </form>
 
-      <div class="my-5 flex items-center gap-3">
-        <div class="flex-1 h-px bg-gray-200"></div>
-        <span class="text-xs text-gray-400">atau</span>
-        <div class="flex-1 h-px bg-gray-200"></div>
-      </div>
-
       <p class="text-center text-xs text-gray-400 mt-6">
         Dengan mendaftar, kamu menyetujui
-        <a href="#" class="text-blue-600 hover:underline">Syarat & Ketentuan</a> SMARTKA.
+        <a href="{{ route('terms') }}" class="text-blue-600 hover:underline">Syarat & Ketentuan</a> SMARTKA.
       </p>
 
     </div>
