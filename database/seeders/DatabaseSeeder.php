@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             LatihanSeeder::class,
             QuestionSeeder::class,
+            SimpleLatihanSeeder::class,
         ]);
 }
 }
+
