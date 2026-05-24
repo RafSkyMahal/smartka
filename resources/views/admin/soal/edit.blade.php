@@ -163,9 +163,9 @@
         <div x-show="type === 'true_false'" class="flex gap-4">
           @foreach(['Benar', 'Salah'] as $val)
           <label class="flex-1 flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition peer-checked:border-blue-600">
-            <input type="radio" name="correct_answer" value="{{ $val }}" 
+            <input type="radio" name="correct_answer" value="{{ strtolower($val) }}" 
               class="w-4 h-4 text-blue-600 focus:ring-blue-500"
-              {{ old('correct_answer', $question->correct_answer) === $val ? 'checked' : '' }}
+              {{ strtolower(old('correct_answer', $question->correct_answer)) === strtolower($val) ? 'checked' : '' }}
               :disabled="type !== 'true_false'">
             <span class="text-sm font-medium text-gray-700">{{ $val }}</span>
           </label>
