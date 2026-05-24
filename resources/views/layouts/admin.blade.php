@@ -24,25 +24,19 @@
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
 
     {{-- Logo --}}
-    <div class="px-5 py-5 border-b border-gray-700">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">🚀</div>
-        <div>
-          <div class="font-extrabold text-white text-base" style="font-family:'Plus Jakarta Sans',sans-serif;">
-            SMARTKA
-          </div>
-          <div class="text-gray-400 text-xs">Admin Panel</div>
-        </div>
-      </div>
+    <div class="px-5 py-3 border-b border-gray-700 flex items-center justify-center">
+      <img src="{{ asset('logo.png') }}" alt="SMARTKA Logo" class="h-16 w-auto object-contain brightness-0 invert">
     </div>
 
     {{-- Admin info --}}
     <div class="px-4 py-3 border-b border-gray-700">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm">👨‍💼</div>
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 bg-blue-600/30 rounded-full flex items-center justify-center text-sm">
+          <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </div>
         <div>
           <div class="text-white text-xs font-semibold">{{ auth()->user()->name }}</div>
-          <div class="text-gray-400 text-xs">Administrator</div>
+          <div class="text-gray-400 text-[10px]">Administrator</div>
         </div>
       </div>
     </div>
@@ -54,18 +48,42 @@
       @endphp
 
       @foreach([
-        ['admin/dashboard',  '📊', 'Dashboard',     'admin.dashboard'],
-        ['admin/mata-pelajaran', '📚', 'Mata Pelajaran', 'admin.mata-pelajaran.index'],
-        ['admin/topik',      '📑', 'Topik / Bab',   'admin.topik.index'],
-        ['admin/soal',       '📝', 'Bank Soal',      'admin.soal.index'],
-        ['admin/paket',      '📦', 'Paket Latihan',  'admin.paket.index'],
-        ['admin/pengguna',   '👥', 'Pengguna',       'admin.pengguna.index'],
-        ['admin/ai-monitor', '🤖', 'AI Monitor',     'admin.ai-monitor.index'],
-      ] as [$path, $icon, $label, $routeName])
+        ['admin/dashboard',  'dashboard', 'Dashboard',     'admin.dashboard'],
+        ['admin/mata-pelajaran', 'subjects', 'Mata Pelajaran', 'admin.mata-pelajaran.index'],
+        ['admin/topik',      'topics', 'Topik / Bab',   'admin.topik.index'],
+        ['admin/soal',       'questions', 'Bank Soal',      'admin.soal.index'],
+        ['admin/paket',      'packages', 'Paket Latihan',  'admin.paket.index'],
+        ['admin/pengguna',   'users', 'Pengguna',       'admin.pengguna.index'],
+        ['admin/ai-monitor', 'ai', 'AI Monitor',     'admin.ai-monitor.index'],
+      ] as [$path, $key, $label, $routeName])
       <a href="{{ route($routeName) }}"
         class="admin-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-300 transition
           {{ str_starts_with($currentPath, $path) ? 'active' : '' }}">
-        <span class="text-base w-5 text-center">{{ $icon }}</span>
+        <span class="w-5 h-5 flex items-center justify-center flex-shrink-0 text-current opacity-80">
+          @switch($key)
+            @case('dashboard')
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              @break
+            @case('subjects')
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              @break
+            @case('topics')
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+              @break
+            @case('questions')
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+              @break
+            @case('packages')
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+              @break
+            @case('users')
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              @break
+            @case('ai')
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              @break
+          @endswitch
+        </span>
         {{ $label }}
       </a>
       @endforeach
@@ -76,7 +94,10 @@
 
       <a href="{{ route('home') }}" target="_blank"
         class="admin-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-300 transition">
-        <span class="text-base w-5 text-center">🌐</span> Lihat Website
+        <span class="w-5 h-5 flex items-center justify-center flex-shrink-0 text-current opacity-80">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+        </span>
+        Lihat Website
       </a>
     </nav>
 
@@ -85,7 +106,8 @@
       <form method="POST" action="{{ route('logout') }}">
         @csrf
         <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-900/30 transition">
-          <span>🚪</span> Keluar
+          <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Keluar
         </button>
       </form>
     </div>

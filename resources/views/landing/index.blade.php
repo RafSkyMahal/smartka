@@ -11,13 +11,8 @@
   <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
 
     {{-- Logo --}}
-    <a href="/" class="flex items-center gap-2.5">
-      <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-md">
-        <span class="text-white text-lg">🚀</span>
-      </div>
-      <span class="text-xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif">
-        SMART<span class="text-blue-600">KA</span>
-      </span>
+    <a href="/" class="flex items-center">
+      <img src="{{ asset('logo.png') }}" alt="SMARTKA Logo" class="h-16 w-auto object-contain">
     </a>
 
     {{-- Desktop Menu --}}
@@ -192,14 +187,29 @@
   <div class="max-w-5xl mx-auto px-6">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
       @foreach([
-        ['50K+',  'Siswa Aktif',        '🧑‍🎓', 'blue'],
-        ['200K+', 'Soal Tersedia',       '📝',   'green'],
-        ['95%',   'Tingkat Kelulusan',   '🏆',   'yellow'],
-        ['500+',  'Sekolah Mitra',       '🏫',   'purple'],
-      ] as [$num, $label, $icon, $color])
-      <div class="text-center p-6 rounded-2xl bg-gray-50 hover:bg-blue-50 transition group">
-        <div class="text-3xl mb-2">{{ $icon }}</div>
-        <div class="text-3xl font-extrabold text-blue-600 mb-1 group-hover:scale-110 transition-transform">
+        ['50K+',  'Siswa Aktif',        'users',  'blue'],
+        ['200K+', 'Soal Tersedia',       'questions', 'green'],
+        ['95%',   'Tingkat Kelulusan',   'trophy', 'yellow'],
+        ['500+',  'Sekolah Mitra',       'school', 'purple'],
+      ] as [$num, $label, $key, $color])
+      <div class="text-center p-6 rounded-2xl bg-gray-50 hover:bg-blue-50 transition group flex flex-col items-center">
+        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          @switch($key)
+            @case('users')
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              @break
+            @case('questions')
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+              @break
+            @case('trophy')
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222m4 9.722v-7.5l-4-2.222"/></svg>
+              @break
+            @case('school')
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              @break
+          @endswitch
+        </div>
+        <div class="text-3xl font-extrabold text-blue-600 mb-1">
           {{ $num }}
         </div>
         <div class="text-gray-500 text-sm">{{ $label }}</div>
@@ -229,17 +239,36 @@
 
     <div class="grid md:grid-cols-3 gap-6">
       @foreach([
-        ['🧠', 'Latihan Soal Adaptif',    '#1a56db', 'Soal menyesuaikan tingkat kemampuanmu secara otomatis. Makin pintar, makin menantang!',          'Mulai Latihan'],
-        ['⏱️', 'Try Out Online',           '#0e9f6e', 'Simulasi ujian nyata dengan timer, kondisi persis seperti hari H. Biasakan diri sebelum ujian!',  'Coba Try Out'],
-        ['🤖', 'Analisis AI Kelemahan',    '#8b5cf6', 'Gemini AI menganalisis hasil latihan dan menemukan topik mana yang perlu lebih banyak latihan.',   'Lihat Analisis'],
-        ['📊', 'Laporan Detail',           '#f59e0b', 'Pantau perkembangan nilai per mata pelajaran, per bab, dan per topik dalam grafik yang mudah dipahami.', 'Lihat Laporan'],
-        ['📖', 'Pembahasan Lengkap',       '#ef4444', 'Setiap soal dilengkapi pembahasan teks dan video step-by-step. Tidak ada soal yang tidak kamu mengerti!', 'Baca Pembahasan'],
-        ['💬', 'Chat AI Tutor 24/7',       '#1a56db', 'Tanya soal apapun kapanpun ke Smartka AI. Upload foto soal dari buku dan dapat jawaban instan!',   'Tanya AI'],
-      ] as [$icon, $title, $color, $desc, $cta])
-      <div class="feature-card bg-white rounded-2xl p-7 shadow-sm border border-gray-100">
+        ['adaptive', 'Latihan Soal Adaptif',    '#1a56db', 'Soal menyesuaikan tingkat kemampuanmu secara otomatis. Makin pintar, makin menantang!',          'Mulai Latihan'],
+        ['timer', 'Try Out Online',           '#0e9f6e', 'Simulasi ujian nyata dengan timer, kondisi persis seperti hari H. Biasakan diri sebelum ujian!',  'Coba Try Out'],
+        ['ai', 'Analisis AI Kelemahan',    '#8b5cf6', 'Gemini AI menganalisis hasil latihan dan menemukan topik mana yang perlu lebih banyak latihan.',   'Lihat Analisis'],
+        ['report', 'Laporan Detail',           '#f59e0b', 'Pantau perkembangan nilai per mata pelajaran, per bab, dan per topik dalam grafik yang mudah dipahami.', 'Lihat Laporan'],
+        ['discussion', 'Pembahasan Lengkap',       '#ef4444', 'Setiap soal dilengkapi pembahasan teks dan video step-by-step. Tidak ada soal yang tidak kamu mengerti!', 'Baca Pembahasan'],
+        ['chat', 'Chat AI Tutor 24/7',       '#1a56db', 'Tanya soal apapun kapanpun ke Smartka AI. Upload foto soal dari buku dan dapat jawaban instan!',   'Tanya AI'],
+      ] as [$key, $title, $color, $desc, $cta])
+      <div class="feature-card bg-white rounded-2xl p-7 shadow-sm border border-gray-100 hover:shadow-md transition">
         <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-5"
-          style="background-color: {{ $color }}18;">
-          {{ $icon }}
+          style="background-color: {{ $color }}18; color: {{ $color }};">
+          @switch($key)
+            @case('adaptive')
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              @break
+            @case('timer')
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              @break
+            @case('ai')
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              @break
+            @case('report')
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+              @break
+            @case('discussion')
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              @break
+            @case('chat')
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              @break
+          @endswitch
         </div>
         <h3 class="font-bold text-gray-800 text-lg mb-3">{{ $title }}</h3>
         <p class="text-gray-500 text-sm leading-relaxed mb-4">{{ $desc }}</p>
@@ -635,9 +664,8 @@
     <div class="grid md:grid-cols-4 gap-10 mb-12">
       {{-- Brand --}}
       <div class="md:col-span-2">
-        <div class="flex items-center gap-2 mb-4">
-          <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">🚀</div>
-          <span class="text-white text-xl font-extrabold">SMARTKA</span>
+        <div class="flex items-center mb-4">
+          <img src="{{ asset('logo.png') }}" alt="SMARTKA Logo" class="h-16 w-auto object-contain brightness-0 invert">
         </div>
         <p class="text-sm leading-relaxed mb-5 max-w-xs">
           Platform belajar cerdas untuk siswa kelas 6, 9, dan 12 Indonesia. Didukung teknologi AI terdepan.

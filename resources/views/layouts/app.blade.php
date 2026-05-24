@@ -38,20 +38,17 @@
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
 
     {{-- Logo --}}
-    <div class="px-5 py-5 border-b border-gray-100">
-      <a href="/" class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">🚀</div>
-        <span class="font-extrabold text-lg text-gray-800" style="font-family:'Plus Jakarta Sans',sans-serif;">
-          SMART<span class="text-blue-600">KA</span>
-        </span>
+    <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-center">
+      <a href="/" class="flex items-center">
+        <img src="{{ asset('logo.png') }}" alt="SMARTKA Logo" class="h-16 w-auto object-contain">
       </a>
     </div>
 
     {{-- User info --}}
     <div class="px-4 py-4 border-b border-gray-100">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-lg flex-shrink-0">
-          🧑‍🎓
+        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
         </div>
         <div class="min-w-0">
           <div class="font-semibold text-sm text-gray-800 truncate">{{ auth()->user()->name }}</div>
@@ -70,27 +67,45 @@
     {{-- Menu --}}
     <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
       @foreach([
-        ['dashboard',        '🏠', 'Beranda',       route('dashboard')],
-        ['latihan',          '📝', 'Latihan Soal',  route('latihan.index')],
-        ['tryout',           '⏱️', 'Try Out',        route('tryout.index')],
-        ['laporan',          '📊', 'Laporan',        route('laporan.index')],
-        ['ai',               '🤖', 'AI Tutor',       '#'],
-        ['pembahasan',       '📖', 'Pembahasan',     '#'],
-        ['peringkat',        '🏆', 'Peringkat',      '#'],
-        ['akun',             '⚙️', 'Pengaturan',     '#'],
-      ] as [$key, $icon, $label, $href])
-        ['dashboard',        '🏠', 'Beranda',       route('dashboard'),        'dashboard'],
-        ['latihan',          '📝', 'Latihan Soal',  route('latihan.index'),    'latihan.*'],
-        ['tryout',           '⏱️', 'Try Out',        '#',                       'tryout.*'],
-        ['laporan',          '📊', 'Laporan',        route('laporan.index'),    'laporan.*'],
-        ['ai',               '🤖', 'AI Tutor',       route('ai.tutor'),         'ai.*'],
-        ['pembahasan',       '📖', 'Pembahasan',     route('pembahasan.index'), 'pembahasan.*'],
-        ['peringkat',        '🏆', 'Peringkat',      route('peringkat.index'),  'peringkat.*'],
-        ['akun',             '⚙️', 'Pengaturan',     route('akun.show'),        'akun.*'],
-      ] as [$key, $icon, $label, $href, $pattern])
+        ['dashboard',        'Beranda',       route('dashboard'),        'dashboard'],
+        ['latihan',          'Latihan Soal',  route('latihan.index'),    'latihan.*'],
+        ['tryout',           'Try Out',        route('tryout.index'),     'tryout.*'],
+        ['laporan',          'Laporan',        route('laporan.index'),    'laporan.*'],
+        ['ai',               'AI Tutor',       route('ai.tutor'),         'ai.*'],
+        ['pembahasan',       'Pembahasan',     route('pembahasan.index'), 'pembahasan.*'],
+        ['peringkat',        'Peringkat',      route('peringkat.index'),  'peringkat.*'],
+        ['akun',             'Pengaturan',     route('akun.show'),        'akun.*'],
+      ] as [$key, $label, $href, $pattern])
       <a href="{{ $href }}"
         class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition {{ request()->routeIs($pattern) ? 'active bg-blue-50 text-blue-600 font-semibold' : 'text-gray-600 hover:bg-gray-50' }}">
-        <span class="text-lg w-6 text-center">{{ $icon }}</span>
+        <span class="w-5 h-5 flex items-center justify-center flex-shrink-0 text-current opacity-80">
+          @switch($key)
+            @case('dashboard')
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              @break
+            @case('latihan')
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+              @break
+            @case('tryout')
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              @break
+            @case('laporan')
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+              @break
+            @case('ai')
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              @break
+            @case('pembahasan')
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              @break
+            @case('peringkat')
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222m4 9.722v-7.5l-4-2.222"/></svg>
+              @break
+            @case('akun')
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              @break
+          @endswitch
+        </span>
         <span>{{ $label }}</span>
       </a>
       @endforeach
@@ -99,10 +114,12 @@
     {{-- Upgrade banner (free user) --}}
     @if(!auth()->user()->isPremium())
     <div class="mx-3 mb-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-white">
-      <div class="text-xl mb-2">⚡</div>
-      <div class="font-bold text-sm mb-1">Upgrade ke Premium</div>
+      <div class="font-bold text-sm mb-1 flex items-center gap-1.5">
+        <svg class="w-4 h-4 text-yellow-300" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>
+        Upgrade ke Premium
+      </div>
       <div class="text-blue-200 text-xs mb-3">Soal unlimited & AI Chat tanpa batas!</div>
-      <a href="#" class="block text-center bg-white text-blue-700 text-xs font-bold py-2 rounded-xl hover:bg-blue-50 transition">
+      <a href="{{ route('premium') }}" class="block text-center bg-white text-blue-700 text-xs font-bold py-2 rounded-xl hover:bg-blue-50 transition">
         Upgrade Sekarang
       </a>
     </div>
@@ -113,7 +130,8 @@
       <form method="POST" action="{{ route('logout') }}">
         @csrf
         <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition">
-          <span class="text-lg">🚪</span> Keluar
+          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Keluar
         </button>
       </form>
     </div>

@@ -19,6 +19,8 @@ use App\Http\Controllers\Student\ReportController;
 use App\Http\Controllers\Student\PembahasanController;
 use App\Http\Controllers\Student\LeaderboardController;
 use App\Http\Controllers\Student\AccountController;
+use App\Http\Controllers\Student\ResultController;
+use App\Http\Controllers\Student\TryoutController;
 
 // ── Public ──────────────────────────────────────────
 Route::get('/', fn() => view('landing.index'))->name('home');
@@ -54,39 +56,35 @@ Route::middleware('auth')->group(function () {
         Route::post('/chat/{message}/feedback', [AiChatController::class, 'feedback'])->name('feedback');
         Route::post('/chat/{message}/star',     [AiChatController::class, 'star'])->name('star');
         Route::get('/sessions',                 [AiChatController::class, 'sessions'])->name('sessions');
-        Route::get('/ai/sessions/{session}',       [AiChatController::class, 'sessionMessages'])->name('session.messages');
-        });
-
-        // Latihan Soal
-        Route::get('/latihan',                 [PackageController::class, 'index'])->name('latihan.index');
-        Route::get('/latihan/{package}',        [PackageController::class, 'show'])->name('latihan.show');
-        Route::get('/latihan/{package}/mulai', [SessionController::class, 'start'])->name('latihan.start');
-        Route::get('/latihan/sesi/{session}', [SessionController::class, 'show'])->name('latihan.mulai');
-        Route::post('/latihan/sesi/{session}/jawab', [SessionController::class, 'submitAnswer'])->name('latihan.submit');
-        Route::post('/latihan/sesi/{session}/selesai', [SessionController::class, 'finish'])->name('latihan.finish');
-        Route::get('/latihan/sesi/{session}/hasil', [\App\Http\Controllers\Student\ResultController::class, 'show'])->name('latihan.hasil');
-
-        // Try Out
-        Route::get('/tryout', [\App\Http\Controllers\Student\TryoutController::class, 'index'])->name('tryout.index');
-
-        // Laporan
-        Route::get('/laporan', [\App\Http\Controllers\Student\ReportController::class, 'index'])->name('laporan.index');
-        });
-
-        // Laporan
-        Route::get('/laporan',                 [ReportController::class, 'index'])->name('laporan.index');
-
-        // Pembahasan
-        Route::get('/pembahasan',              [PembahasanController::class, 'index'])->name('pembahasan.index');
-
-        // Peringkat
-        Route::get('/peringkat',               [LeaderboardController::class, 'index'])->name('peringkat.index');
-
-        // Pengaturan Akun
-        Route::get('/akun',                    [AccountController::class, 'show'])->name('akun.show');
-        Route::post('/akun/update',            [AccountController::class, 'updateProfile'])->name('akun.update-profile');
-        Route::post('/akun/update-password',   [AccountController::class, 'updatePassword'])->name('akun.update-password');
+        Route::get('/sessions/{session}',       [AiChatController::class, 'sessionMessages'])->name('session.messages');
     });
+
+    // Latihan Soal
+    Route::get('/latihan',                 [PackageController::class, 'index'])->name('latihan.index');
+    Route::get('/latihan/{package}',        [PackageController::class, 'show'])->name('latihan.show');
+    Route::get('/latihan/{package}/mulai', [SessionController::class, 'start'])->name('latihan.start');
+    Route::get('/latihan/sesi/{session}', [SessionController::class, 'show'])->name('latihan.mulai');
+    Route::post('/latihan/sesi/{session}/jawab', [SessionController::class, 'submitAnswer'])->name('latihan.submit');
+    Route::post('/latihan/sesi/{session}/selesai', [SessionController::class, 'finish'])->name('latihan.finish');
+    Route::get('/latihan/sesi/{session}/hasil', [ResultController::class, 'show'])->name('latihan.hasil');
+
+    // Try Out
+    Route::get('/tryout', [TryoutController::class, 'index'])->name('tryout.index');
+
+    // Laporan
+    Route::get('/laporan', [ReportController::class, 'index'])->name('laporan.index');
+
+    // Pembahasan
+    Route::get('/pembahasan',              [PembahasanController::class, 'index'])->name('pembahasan.index');
+
+    // Peringkat
+    Route::get('/peringkat',               [LeaderboardController::class, 'index'])->name('peringkat.index');
+
+    // Pengaturan Akun
+    Route::get('/akun',                    [AccountController::class, 'show'])->name('akun.show');
+    Route::post('/akun/update',            [AccountController::class, 'updateProfile'])->name('akun.update-profile');
+    Route::post('/akun/update-password',   [AccountController::class, 'updatePassword'])->name('akun.update-password');
+});
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');

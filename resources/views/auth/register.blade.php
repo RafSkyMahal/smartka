@@ -34,18 +34,17 @@
 
     <div class="relative z-10 text-center text-white max-w-md">
       {{-- Logo --}}
-      <div class="flex items-center justify-center gap-3 mb-10">
-        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-          <span class="text-blue-600 text-2xl">🚀</span>
-        </div>
-        <span class="text-3xl font-extrabold tracking-wide" style="font-family:'Plus Jakarta Sans',sans-serif">SMARTKA</span>
+      <div class="flex items-center justify-center mb-10">
+        <img src="{{ asset('logo.png') }}" alt="SMARTKA Logo" class="h-24 w-auto object-contain brightness-0 invert">
       </div>
 
-      {{-- Ilustrasi emoji besar --}}
-      <div class="text-9xl mb-8 select-none">🎯</div>
+      {{-- Ilustrasi --}}
+      <div class="w-24 h-24 bg-white/10 rounded-3xl mx-auto flex items-center justify-center mb-8">
+        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
 
       <h2 class="text-3xl font-bold mb-4" style="font-family:'Plus Jakarta Sans',sans-serif">
-        Mulai Perjalanan<br>Prestasimu Disini! 🌟
+        Mulai Perjalanan<br>Prestasimu Disini!
       </h2>
       <p class="text-blue-200 text-lg leading-relaxed">
         Ribuan soal, analisis AI, dan try out menunggumu.<br>
@@ -77,9 +76,8 @@
     <div class="w-full max-w-md">
 
       {{-- Logo mobile --}}
-      <div class="flex items-center gap-2 mb-8 lg:hidden justify-center">
-        <span class="text-2xl">🚀</span>
-        <span class="text-xl font-extrabold text-blue-600" style="font-family:'Plus Jakarta Sans',sans-serif">SMARTKA</span>
+      <div class="flex items-center mb-8 lg:hidden justify-center">
+        <img src="{{ asset('logo.png') }}" alt="SMARTKA Logo" class="h-16 w-auto object-contain">
       </div>
 
       {{-- Stepper --}}
