@@ -57,8 +57,10 @@ class QuestionController extends Controller
             'option_b'     => 'required_if:type,multiple_choice',
             'option_c'     => 'required_if:type,multiple_choice',
             'option_d'     => 'required_if:type,multiple_choice',
+            'option_e'     => 'nullable',
             'correct_answer'    => 'required|string',
             'explanation_text'  => 'nullable|string',
+            'explanation_video_url' => 'nullable|url',
             'status'            => 'required|in:draft,active,archived',
         ]);
 
@@ -89,8 +91,16 @@ class QuestionController extends Controller
             'topic_id'      => 'required|exists:topics,id',
             'class_level'   => 'required|in:6,9,12',
             'difficulty'    => 'required|in:easy,medium,hard',
+            'type'          => 'required|in:multiple_choice,true_false,short_answer',
             'question_text' => 'required|string',
+            'option_a'      => 'nullable|required_if:type,multiple_choice',
+            'option_b'      => 'nullable|required_if:type,multiple_choice',
+            'option_c'      => 'nullable|required_if:type,multiple_choice',
+            'option_d'      => 'nullable|required_if:type,multiple_choice',
+            'option_e'      => 'nullable',
             'correct_answer'=> 'required|string',
+            'explanation_text'  => 'nullable|string',
+            'explanation_video_url' => 'nullable|url',
             'status'        => 'required|in:draft,active,archived',
         ]);
 

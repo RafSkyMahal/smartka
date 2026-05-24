@@ -139,19 +139,39 @@
 
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Jawaban Benar</label>
+        
+        {{-- Pilihan Ganda --}}
         <div x-show="type === 'multiple_choice'" class="flex gap-2">
           @foreach(['a','b','c','d','e'] as $opt)
-          <label class="flex-1">
-            <input type="radio" name="correct_answer" value="{{ $opt }}" class="sr-only peer" {{ old('correct_answer') === $opt ? 'checked' : '' }}>
+          <label class="flex-1" for="correct_answer_{{ $opt }}">
+            <input type="radio" name="correct_answer" value="{{ $opt }}" id="correct_answer_{{ $opt }}" 
+              class="sr-only peer" {{ old('correct_answer') === $opt ? 'checked' : '' }}
+              :disabled="type !== 'multiple_choice'">
             <div class="text-center border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 py-2.5 rounded-xl cursor-pointer font-bold text-sm transition uppercase">
               {{ $opt }}
             </div>
           </label>
           @endforeach
         </div>
-        <div x-show="type !== 'multiple_choice'">
-          <input type="text" name="correct_answer" value="{{ old('correct_answer') }}" placeholder="Jawaban benar..."
-            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        {{-- Benar / Salah --}}
+        <div x-show="type === 'true_false'" class="flex gap-4">
+          @foreach(['Benar', 'Salah'] as $val)
+          <label class="flex-1 flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition peer-checked:border-blue-600">
+            <input type="radio" name="correct_answer" value="{{ $val }}" 
+              class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+              {{ old('correct_answer') === $val ? 'checked' : '' }}
+              :disabled="type !== 'true_false'">
+            <span class="text-sm font-medium text-gray-700">{{ $val }}</span>
+          </label>
+          @endforeach
+        </div>
+
+        {{-- Isian Singkat --}}
+        <div x-show="type === 'short_answer'">
+          <input type="text" name="correct_answer" value="{{ old('correct_answer') }}" placeholder="Ketik jawaban singkat yang benar..."
+            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :disabled="type !== 'short_answer'">
         </div>
       </div>
 
