@@ -57,9 +57,9 @@
           <div class="font-semibold text-sm text-gray-800 dark:text-gray-100 truncate">{{ auth()->user()->name }}</div>
           <div class="flex items-center gap-1.5 mt-0.5">
             @if(auth()->user()->isPremium())
-            <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">PREMIUM</span>
+            <span class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">⭐ PREMIUM</span>
             @else
-            <span class="bg-gray-100 text-gray-500 text-xs font-medium px-2 py-0.5 rounded-full">FREE</span>
+            <span class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs font-medium px-2 py-0.5 rounded-full">FREE</span>
             @endif
             <span class="text-gray-400 dark:text-gray-500 text-xs">Kelas {{ auth()->user()->class_level }}</span>
           </div>
@@ -191,12 +191,40 @@
             </div>
           </div>
         </div>
-        {{-- Avatar --}}
-        <div class="w-9 h-9 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-base border border-blue-200 dark:border-blue-800">🧑‍🎓</div>
+        {{-- Avatar di topbar --}}
+        <div class="w-9 h-9 rounded-xl overflow-hidden border border-blue-200 dark:border-blue-800 flex-shrink-0">
+          @if(auth()->user()->avatar)
+          <img src="{{ auth()->user()->avatar }}" alt="Avatar" class="w-full h-full object-cover">
+          @else
+          <div class="w-full h-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-sm">
+            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+          </div>
+          @endif
+        </div>
       </div>
     </header>
 
     {{-- Flash messages --}}
+    @if(session('premium_success'))
+    <div class="mx-6 mt-4 rounded-2xl overflow-hidden shadow-lg" x-data="{ show: true }" x-show="show" x-transition>
+      <div class="bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-500 p-0.5 rounded-2xl">
+        <div class="bg-white dark:bg-gray-800 rounded-[14px] px-5 py-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="text-3xl">🎉</div>
+            <div>
+              <div class="font-bold text-gray-800 dark:text-white text-sm">{{ session('premium_success') }}</div>
+              <div class="text-gray-500 dark:text-gray-400 text-xs mt-0.5">Nikmati semua fitur premium tanpa batas mulai sekarang!</div>
+            </div>
+          </div>
+          <button @click="show = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    @endif
     @if(session('success'))
     <div class="mx-6 mt-4 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm flex gap-2">
       <span>✅</span> {{ session('success') }}
@@ -234,6 +262,18 @@
   @auth
     @include('components.ai-chat-widget')
   @endauth
+
+  {{-- Midtrans Snap.js --}}
+  @if(config('services.midtrans.is_production'))
+  <script src="https://app.midtrans.com/snap/snap.js"
+    data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+  @else
+  <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+  @endif
+
+  {{-- Extra scripts from child views --}}
+  @stack('scripts')
 
 </body>
 </html>

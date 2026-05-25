@@ -7,7 +7,6 @@ use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
@@ -24,7 +23,17 @@ class PaymentController extends Controller
         ],
     ];
 
-    // ── Halaman Checkout ──────────────────────────────
+    // ── Inisialisasi Midtrans ─────────────────────────────
+    private function initMidtrans(): void
+    {
+        \Midtrans\Config::$serverKey    = config('services.midtrans.server_key');
+        \Midtrans\Config::$clientKey    = config('services.midtrans.client_key');
+        \Midtrans\Config::$isProduction = config('services.midtrans.is_production');
+        \Midtrans\Config::$isSanitized  = config('services.midtrans.is_sanitized');
+        \Midtrans\Config::$is3ds        = config('services.midtrans.is_3ds');
+    }
+
+    // ── Halaman Checkout ──────────────────────────────────
     public function checkout(string $plan)
     {
         if (!array_key_exists($plan, $this->plans)) {
@@ -32,41 +41,20 @@ class PaymentController extends Controller
         }
 
         /** @var \App\Models\User $user */
-        $user     = Auth::user();
-        $planData = $this->plans[$plan];
+        $user      = Auth::user();
+        $planData  = $this->plans[$plan];
+        $clientKey = config('services.midtrans.client_key');
 
-        $paymentMethods = [
-            'bank_transfer' => [
-                'label' => 'Transfer Bank',
-                'icon'  => '🏦',
-                'banks' => ['BCA', 'BNI', 'BRI', 'Mandiri'],
-            ],
-            'ewallet' => [
-                'label'   => 'E-Wallet',
-                'icon'    => '📱',
-                'wallets' => ['GoPay', 'OVO', 'DANA', 'ShopeePay'],
-            ],
-            'qris' => [
-                'label' => 'QRIS',
-                'icon'  => '📷',
-            ],
-            'credit_card' => [
-                'label' => 'Kartu Kredit / Debit',
-                'icon'  => '💳',
-            ],
-        ];
-
-        return view('premium.checkout', compact('plan', 'planData', 'user', 'paymentMethods'));
+        return view('premium.checkout', compact('plan', 'planData', 'user', 'clientKey'));
     }
 
-    // ── Proses Pembayaran ─────────────────────────────
+    // ── Proses Pembayaran (Buat Snap Token) ───────────────
     public function process(Request $request)
     {
         $request->validate([
-            'plan'           => 'required|in:premium,premium_plus',
-            'period'         => 'required|in:monthly,yearly',
-            'payment_method' => 'required|string',
-            'promo_code'     => 'nullable|string|max:20',
+            'plan'       => 'required|in:premium,premium_plus',
+            'period'     => 'required|in:monthly,yearly',
+            'promo_code' => 'nullable|string|max:20',
         ]);
 
         /** @var \App\Models\User $user */
@@ -80,11 +68,9 @@ class PaymentController extends Controller
             ? $planData['price_year']
             : $planData['price'];
 
-        // Diskon promo (simulasi)
-        $discount = 0;
+        // Diskon promo
         if ($request->promo_code === 'SMARTKA10') {
-            $discount = (int) ($amount * 0.10);
-            $amount   = $amount - $discount;
+            $amount = $amount - (int) ($amount * 0.10);
         }
 
         // Buat record payment
@@ -92,100 +78,171 @@ class PaymentController extends Controller
             'user_id'        => $user->id,
             'plan'           => $plan,
             'amount'         => $amount,
-            'payment_method' => $request->payment_method,
+            'payment_method' => $period, // monthly | yearly
             'status'         => 'pending',
         ]);
 
-        // Untuk simulasi development — langsung sukses
-        // Di production, integrasikan dengan Midtrans/Xendit
-        if (app()->environment('local')) {
-            return redirect()->route('payment.status', $payment->id)
-                ->with('simulate', true);
-        }
+        $orderId = 'SMARTKA-' . $payment->id . '-' . time();
 
-        return redirect()->route('payment.status', $payment->id);
+        // Generate Midtrans Snap Token
+        try {
+            $this->initMidtrans();
+
+            $snapToken = \Midtrans\Snap::getSnapToken([
+                'transaction_details' => [
+                    'order_id'     => $orderId,
+                    'gross_amount' => (int) $amount,
+                ],
+                'customer_details' => [
+                    'first_name' => $user->name,
+                    'email'      => $user->email,
+                    'phone'      => $user->phone ?? '',
+                ],
+                'item_details' => [
+                    [
+                        'id'       => $plan . '_' . $period,
+                        'price'    => (int) $amount,
+                        'quantity' => 1,
+                        'name'     => $planData['name'] . ' (' . ($period === 'yearly' ? 'Tahunan' : 'Bulanan') . ')',
+                    ],
+                ],
+                'callbacks' => [
+                    'finish' => route('payment.finish', $payment->id),
+                ],
+            ]);
+
+            $payment->update(['gateway_transaction_id' => $orderId]);
+
+            return response()->json([
+                'snap_token' => $snapToken,
+                'payment_id' => $payment->id,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Midtrans error: ' . $e->getMessage());
+
+            // Fallback dev mode — aktifkan langsung dan balik ke dashboard
+            if (app()->environment('local')) {
+                $this->activateSubscription($payment);
+                return response()->json([
+                    'redirect' => route('dashboard') . '?payment=success',
+                ]);
+            }
+
+            return response()->json(['error' => 'Gagal menghubungi Midtrans. Coba lagi.'], 500);
+        }
     }
 
-    // ── Halaman Status Pembayaran ─────────────────────
-    public function status(Payment $payment)
+    // ── Finish Handler (setelah Snap berhasil) ────────────
+    // Dipanggil via redirect dari onSuccess JS, BUKAN webhook.
+    // Tugasnya: aktifkan subscription lalu redirect ke dashboard.
+    public function finish(Request $request, $paymentId)
     {
         /** @var \App\Models\User $user */
-        $user = Auth::user();
+        $user    = Auth::user();
+        $payment = Payment::find($paymentId);
 
-        // Pastikan payment milik user ini
-        if ($payment->user_id !== $user->id) {
-            abort(403);
+        // Validasi payment milik user ini
+        if (!$payment || (int) $payment->user_id !== (int) $user->id) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Data pembayaran tidak ditemukan.');
         }
 
-        // Simulasi: jika dari local, langsung aktivasi
-        if (session('simulate') && $payment->status === 'pending') {
-            $this->activateSubscription($payment);
-            $payment->refresh();
+        // Aktivasi jika belum (webhook mungkin belum tiba)
+        if ($payment->status === 'pending') {
+            $transactionStatus = $request->query('transaction_status', 'settlement');
+
+            if (in_array($transactionStatus, ['capture', 'settlement'])) {
+                $this->activateSubscription($payment, $request->query('transaction_id'));
+            }
         }
 
-        return view('premium.status', compact('payment', 'user'));
+        // Refresh user dari database agar status terbaru
+        $payment->refresh();
+
+        return redirect()->route('dashboard')
+            ->with('premium_success', '🎉 Selamat! Akun kamu sudah aktif sebagai ' . ucwords(str_replace('_', ' ', $payment->plan)) . '!');
     }
 
-    // ── Webhook Callback Payment Gateway ─────────────
+    // ── Webhook Callback Midtrans ─────────────────────────
     public function callback(Request $request)
     {
-        Log::info('Payment callback', $request->all());
+        Log::info('Midtrans callback', $request->all());
 
-        // Implementasi verifikasi signature sesuai gateway
-        // Contoh untuk Midtrans:
-        $orderId       = $request->order_id ?? null;
-        $transactionId = $request->transaction_id ?? null;
-        $statusCode    = $request->status_code ?? null;
-        $grossAmount   = $request->gross_amount ?? null;
+        $this->initMidtrans();
 
-        if (!$orderId) {
-            return response()->json(['error' => 'Invalid callback'], 400);
+        $notif = new \Midtrans\Notification();
+
+        $orderId       = $notif->order_id;
+        $statusCode    = $notif->status_code;
+        $grossAmount   = $notif->gross_amount;
+        $transactionId = $notif->transaction_id;
+        $transStatus   = $notif->transaction_status;
+        $fraudStatus   = $notif->fraud_status ?? null;
+
+        // Verifikasi signature SHA-512
+        $serverKey    = config('services.midtrans.server_key');
+        $expectedSign = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+
+        if ($expectedSign !== $notif->signature_key) {
+            Log::warning('Midtrans: Invalid signature for order ' . $orderId);
+            return response()->json(['error' => 'Invalid signature'], 403);
         }
 
-        $payment = Payment::find($orderId);
+        // Cari payment ID dari order_id (format: SMARTKA-{id}-{timestamp})
+        $parts     = explode('-', $orderId);
+        $paymentId = $parts[1] ?? null;
+        $payment   = $paymentId ? Payment::find($paymentId) : null;
 
         if (!$payment) {
             return response()->json(['error' => 'Payment not found'], 404);
         }
 
-        if ($statusCode === '200') {
-            $this->activateSubscription($payment);
-        } elseif (in_array($statusCode, ['201', '202'])) {
+        // Proses status
+        if ($transStatus === 'capture' && $fraudStatus === 'accept') {
+            $this->activateSubscription($payment, $transactionId);
+        } elseif ($transStatus === 'settlement') {
+            $this->activateSubscription($payment, $transactionId);
+        } elseif ($transStatus === 'pending') {
             $payment->update(['status' => 'pending']);
-        } else {
+        } elseif (in_array($transStatus, ['deny', 'expire', 'cancel', 'failure'])) {
             $payment->update(['status' => 'failed']);
         }
 
         return response()->json(['ok' => true]);
     }
 
-    // ── Helper: Aktivasi langganan ────────────────────
-    private function activateSubscription(Payment $payment): void
+    // ── Helper: Aktivasi langganan ────────────────────────
+    private function activateSubscription(Payment $payment, ?string $transactionId = null): void
     {
-        $months = str_contains($payment->payment_method ?? '', 'yearly') ? 12 : 1;
+        // Jangan proses dua kali
+        if ($payment->status === 'success') {
+            return;
+        }
 
-        // Update payment
+        $months = ($payment->payment_method === 'yearly') ? 12 : 1;
+
         $payment->update([
-            'status'  => 'success',
-            'paid_at' => now(),
+            'status'                 => 'success',
+            'paid_at'                => now(),
+            'gateway_transaction_id' => $transactionId ?? $payment->gateway_transaction_id,
         ]);
 
-        // Update user
         $payment->user->update([
             'subscription_status'  => $payment->plan,
             'subscription_ends_at' => now()->addMonths($months),
         ]);
 
-        // Buat record subscription
-        Subscription::create([
-            'user_id'        => $payment->user_id,
-            'plan'           => $payment->plan,
-            'start_date'     => now(),
-            'end_date'       => now()->addMonths($months),
-            'payment_status' => 'success',
-            'amount'         => $payment->amount,
-            'payment_method' => $payment->payment_method,
-            'transaction_id' => $payment->gateway_transaction_id,
-        ]);
+        Subscription::updateOrCreate(
+            ['user_id' => $payment->user_id, 'plan' => $payment->plan],
+            [
+                'start_date'     => now(),
+                'end_date'       => now()->addMonths($months),
+                'payment_status' => 'success',
+                'amount'         => $payment->amount,
+                'payment_method' => $payment->payment_method,
+                'transaction_id' => $transactionId ?? $payment->gateway_transaction_id,
+            ]
+        );
     }
 }

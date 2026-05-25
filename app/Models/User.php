@@ -19,8 +19,10 @@ class User extends Authenticatable
         'role',
         'class_level',
         'avatar',
+        'google_id',
         'otp_code',
         'otp_expires_at',
+        'email_verified_at',
         'subscription_status',
         'subscription_ends_at',
     ];
@@ -37,8 +39,17 @@ class User extends Authenticatable
         'email_verified_at'    => 'datetime',
         'otp_expires_at'       => 'datetime',
         'subscription_ends_at' => 'datetime',
-        'password'             => 'hashed',
     ];
+
+    // ─── Hash password hanya jika tidak null ──────────────
+    public function setPasswordAttribute(?string $value): void
+    {
+        if ($value !== null) {
+            $this->attributes['password'] = bcrypt($value);
+        } else {
+            $this->attributes['password'] = null;
+        }
+    }
 
     // ═══════════════════════════════════════════════════════
     // RELASI

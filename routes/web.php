@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\PremiumController;
@@ -37,6 +38,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password',       [AuthController::class, 'sendReset'])->name('password.email');
     Route::get('/reset-password/{token}', [AuthController::class, 'showReset'])->name('password.reset');
     Route::post('/reset-password',        [AuthController::class, 'resetPassword'])->name('password.update');
+
+    // Google OAuth
+    Route::get('/auth/google',          [GoogleController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])
@@ -46,9 +51,9 @@ Route::post('/logout', [AuthController::class, 'logout'])
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard',             [StudentController::class, 'dashboard'])->name('dashboard');
     Route::get('/premium',               [PremiumController::class, 'index'])->name('premium');
-    Route::get('/checkout/{plan}',       [PaymentController::class, 'checkout'])->name('checkout');
-    Route::post('/payment/process',      [PaymentController::class, 'process'])->name('payment.process');
-    Route::get('/payment/status/{id}',   [PaymentController::class, 'status'])->name('payment.status');
+    Route::get('/checkout/{plan}',           [PaymentController::class, 'checkout'])->name('checkout');
+    Route::post('/payment/process',          [PaymentController::class, 'process'])->name('payment.process');
+    Route::get('/payment/finish/{paymentId}', [PaymentController::class, 'finish'])->name('payment.finish');
 
     Route::prefix('ai')->name('ai.')->group(function () {
         Route::get('/tutor',                    [AiChatController::class, 'index'])->name('tutor');
@@ -84,6 +89,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/akun',                    [AccountController::class, 'show'])->name('akun.show');
     Route::post('/akun/update',            [AccountController::class, 'updateProfile'])->name('akun.update-profile');
     Route::post('/akun/update-password',   [AccountController::class, 'updatePassword'])->name('akun.update-password');
+
+    // Setup kelas (untuk user baru via Google OAuth)
+    Route::get('/setup-kelas',   [GoogleController::class, 'showSetupKelas'])->name('setup.kelas');
+    Route::post('/setup-kelas',  [GoogleController::class, 'saveSetupKelas'])->name('setup.kelas.save');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
