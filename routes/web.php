@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/akun',                    [AccountController::class, 'show'])->name('akun.show');
     Route::post('/akun/update',            [AccountController::class, 'updateProfile'])->name('akun.update-profile');
     Route::post('/akun/update-password',   [AccountController::class, 'updatePassword'])->name('akun.update-password');
+    Route::delete('/akun/remove-avatar',   [AccountController::class, 'removeAvatar'])->name('akun.remove-avatar');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {

@@ -11,20 +11,22 @@
   <div class="lg:col-span-1 space-y-6">
     <div class="bg-white rounded-2xl border border-gray-100 p-6 text-center shadow-sm dark:bg-gray-800 dark:border-gray-700">
       
-      {{-- Avatar Preview Container --}}
+      {{-- Avatar Preview Container (live preview saat file dipilih) --}}
       <div class="relative w-28 h-28 mx-auto group">
-        @if($user->avatar)
-          <img src="{{ asset('storage/' . $user->avatar) }}" 
-               alt="{{ $user->name }}" 
-               class="w-full h-full object-cover rounded-2xl border-4 border-gray-50 dark:border-gray-700 shadow-sm transition group-hover:scale-105">
-        @else
-          <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-4xl text-white shadow-inner font-bold select-none transition group-hover:scale-105">
-            {{ strtoupper(substr($user->name, 0, 1)) }}
-          </div>
-        @endif
-        
-        <div class="absolute -bottom-1.5 -right-1.5 bg-blue-600 text-white p-1.5 rounded-lg text-xs shadow-md border border-white dark:border-gray-800 cursor-pointer" 
-             @click="tab = 'profil'; $nextTick(() => $refs.avatarInput.focus())" title="Ganti Foto">
+        {{-- Foto profil / live preview --}}
+        <img id="avatar-preview-img"
+             src="{{ $user->avatar ? asset('storage/' . $user->avatar) : '' }}"
+             alt="{{ $user->name }}"
+             class="w-full h-full object-cover rounded-2xl border-4 border-gray-50 dark:border-gray-700 shadow-sm transition group-hover:scale-105 {{ $user->avatar ? '' : 'hidden' }}">
+
+        {{-- Inisial nama (fallback jika belum ada foto) --}}
+        <div id="avatar-preview-initial"
+             class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-4xl text-white shadow-inner font-bold select-none transition group-hover:scale-105 {{ $user->avatar ? 'hidden' : '' }}">
+          {{ strtoupper(substr($user->name, 0, 1)) }}
+        </div>
+
+        <div class="absolute -bottom-1.5 -right-1.5 bg-blue-600 text-white p-1.5 rounded-lg text-xs shadow-md border border-white dark:border-gray-800 cursor-pointer"
+             @click="tab = 'profil'; $nextTick(() => $refs.avatarInput.click())" title="Ganti Foto">
           📷
         </div>
       </div>
@@ -178,11 +180,25 @@
                 <label for="avatar" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Ganti Foto Profil (Avatar)</label>
                 <input type="file" name="avatar" id="avatar" x-ref="avatarInput"
                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-600 cursor-pointer dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 dark:file:bg-blue-950 dark:file:text-blue-300"
-                  accept="image/jpeg,image/png,image/jpg,image/webp">
-                <span class="block text-[11px] text-gray-400 dark:text-gray-500 mt-1.5">Format: JPG, PNG, WEBP. Maksimum berkas 2 MB.</span>
+                  accept="image/jpeg,image/png,image/jpg,image/webp"
+                  onchange="smartkaPreviewAvatar(event)">
+                <span class="block text-[11px] text-gray-400 dark:text-gray-500 mt-1.5">Format: JPG, PNG, WEBP. Maksimum 2 MB. Preview langsung muncul saat file dipilih.</span>
                 @error('avatar')
                   <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
                 @enderror
+
+                {{-- Tombol Hapus Foto (hanya muncul jika user sudah punya avatar) --}}
+                @if($user->avatar)
+                <form action="{{ route('akun.remove-avatar') }}" method="POST" class="mt-3"
+                      onsubmit="return confirm('Hapus foto profil? Tindakan ini tidak bisa dibatalkan.')">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit"
+                    class="inline-flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-semibold transition">
+                    🗑️ Hapus Foto Profil
+                  </button>
+                </form>
+                @endif
               </div>
             </div>
 
@@ -643,4 +659,30 @@
   </div>
 
 </div>
+
+<script>
+  /**
+   * SMARTKA — Pratinjau foto profil secara langsung saat file dipilih.
+   * Fungsi ini dipanggil via onchange pada input[type=file] avatar.
+   */
+  function smartkaPreviewAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const imgEl   = document.getElementById('avatar-preview-img');
+      const initEl  = document.getElementById('avatar-preview-initial');
+
+      if (imgEl) {
+        imgEl.src = e.target.result;
+        imgEl.classList.remove('hidden');
+      }
+      if (initEl) {
+        initEl.classList.add('hidden');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
 @endsection

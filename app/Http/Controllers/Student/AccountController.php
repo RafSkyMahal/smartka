@@ -123,4 +123,24 @@ class AccountController extends Controller
 
         return redirect()->route('akun.show')->with('success', 'Kata sandi Anda berhasil diperbarui!');
     }
+
+    /**
+     * Hapus foto profil (avatar) pengguna dari storage dan database
+     */
+    public function removeAvatar()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Hapus file dari storage jika ada
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        // Reset kolom avatar ke null
+        $user->avatar = null;
+        $user->save();
+
+        return redirect()->route('akun.show')->with('success', 'Foto profil berhasil dihapus.');
+    }
 }

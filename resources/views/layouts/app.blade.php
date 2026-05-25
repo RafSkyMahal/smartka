@@ -50,8 +50,17 @@
          @sidebar-profile-changed.window="showProfile = $event.detail"
          x-show="showProfile">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-          <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        {{-- Foto avatar pengguna di sidebar --}}
+        <div class="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden ring-2 ring-blue-100 dark:ring-blue-900/50">
+          @if(auth()->user()->avatar)
+            <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
+                 alt="{{ auth()->user()->name }}"
+                 class="w-full h-full object-cover">
+          @else
+            <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-base">
+              {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+            </div>
+          @endif
         </div>
         <div class="min-w-0">
           <div class="font-semibold text-sm text-gray-800 dark:text-gray-100 truncate">{{ auth()->user()->name }}</div>
@@ -191,8 +200,19 @@
             </div>
           </div>
         </div>
-        {{-- Avatar --}}
-        <div class="w-9 h-9 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-base border border-blue-200 dark:border-blue-800">🧑‍🎓</div>
+        {{-- Avatar (foto profil pengguna, klik untuk ke halaman akun) --}}
+        <a href="{{ route('akun.show') }}"
+           class="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 ring-2 ring-gray-200 dark:ring-gray-600 hover:ring-blue-400 transition block" title="Pengaturan Akun">
+          @if(auth()->user()->avatar)
+            <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
+                 alt="{{ auth()->user()->name }}"
+                 class="w-full h-full object-cover">
+          @else
+            <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+              {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+            </div>
+          @endif
+        </a>
       </div>
     </header>
 
